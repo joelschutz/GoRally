@@ -23,3 +23,14 @@ type Competitor struct {
 	Vehicle Vehicle
 	Racer   Racer
 }
+
+type TrackResult struct {
+	TotalTime     float64
+	TimeBySegment []float64
+}
+
+type EventResults struct {
+	TotalTimes map[Competitor][]TrackResult
+}
+
+type Ranking map[Competitor]float64

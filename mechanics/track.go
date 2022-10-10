@@ -7,7 +7,7 @@ import (
 	"github.com/joelschutz/gorally/models"
 )
 
-func calcTime(t models.Track, r models.Racer, v models.Vehicle) float64 {
+func CalcTrackTime(t models.Track, r models.Racer, v models.Vehicle) (tr models.TrackResult) {
 	vs := VehicleState{}
 	segmentsTime := []float64{}
 	for i, segment := range t.Segments {
@@ -32,7 +32,9 @@ func calcTime(t models.Track, r models.Racer, v models.Vehicle) float64 {
 			}
 		}
 	}
-	return sumSegmentTimes(segmentsTime)
+	tr.TotalTime = sumSegmentTimes(segmentsTime)
+	tr.TimeBySegment = segmentsTime
+	return tr
 }
 
 func sumSegmentTimes(times []float64) (sum float64) {
