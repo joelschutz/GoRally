@@ -15,7 +15,7 @@ const (
 )
 
 type VehicleStats struct {
-	Weight, Power, Torque, Gears uint32
-	Class                        Class
-	DriveTrain                   DriveTrain
+	Weight, Power, Torque, BreakTorque, Gears uint32
+	Class                                     Class
+	DriveTrain                                DriveTrain
 }
