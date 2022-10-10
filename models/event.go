@@ -29,8 +29,6 @@ type TrackResult struct {
 	TimeBySegment []float64
 }
 
-type EventResults struct {
-	TotalTimes map[Competitor][]TrackResult
-}
+type EventResults map[Competitor][]TrackResult
 
 type Ranking map[Competitor]float64
