@@ -12,6 +12,7 @@ type AppliedAcceleration float64
 
 type VehicleState struct {
 	Speed, Acceleration, Damage, Fuel float64
+	Location                          uint64 // Segment index
 }
 
 func calcFinalVelocity(v models.Vehicle, vs VehicleState, aa AppliedAcceleration, tickTime time.Duration) (float64, error) {
