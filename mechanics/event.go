@@ -5,7 +5,7 @@ import "github.com/joelschutz/gorally/models"
 func calcEventResults(e models.Event) (er models.EventResults) {
 	for _, comp := range e.Competitors {
 		for i, t := range e.Tracks {
-			er[comp][i] = CalcTrackTime(t, comp.Racer, comp.Vehicle)
+			er[comp][i] = CalcTrackTime(t, comp.Driver, comp.Vehicle)
 		}
 	}
 	return er

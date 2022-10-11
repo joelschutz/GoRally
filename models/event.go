@@ -21,7 +21,7 @@ const (
 
 type Competitor struct {
 	Vehicle Vehicle
-	Racer   Racer
+	Driver  Driver
 }
 
 type TrackResult struct {

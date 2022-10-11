@@ -7,15 +7,15 @@ import (
 	"github.com/joelschutz/gorally/models"
 )
 
-func CalcTrackTime(t models.Track, r models.Racer, v models.Vehicle) (tr models.TrackResult) {
+func CalcTrackTime(t models.Track, r models.Driver, v models.Vehicle) (tr models.TrackResult) {
 	vs := VehicleState{}
 	segmentsTime := []float64{}
 	for i, segment := range t.Segments {
 		distanceLeft := float64(segment.Length)
 		for {
 			segmentsTime[i]++
-			acc := CalcDriverAcceleration(r, v, segment, vs)
-			if vs.Speed <= calcMaxSegmentSpeed(segment, v) && acc <= calcMaxSegmentTorque(segment, v) { // Check if car is too fast to make the segment
+			acc := CalcDriverAcceleration(t, r, v, segment, vs)
+			if vs.Speed <= CalcMaxSegmentSpeed(segment, v) && acc <= CalcMaxSegmentTorque(segment, v) { // Check if car is too fast to make the segment
 				speed := vs.Speed + acc
 				distanceTraveled := speed
 				vs.Speed = speed
@@ -44,7 +44,7 @@ func sumSegmentTimes(times []float64) (sum float64) {
 	return sum
 }
 
-func calcMaxSegmentTorque(s models.Segmnent, v models.Vehicle) float64 {
+func CalcMaxSegmentTorque(s models.Segmnent, v models.Vehicle) float64 {
 	if s.Direction == models.Straight {
 		return CalcMaxStraightTorque(s, v)
 	}
@@ -67,7 +67,7 @@ func CalcMaxCornerTorque(s models.Segmnent, v models.Vehicle) float64 {
 	// return terrainDrag * vehicleMass * gravity
 }
 
-func calcMaxSegmentSpeed(s models.Segmnent, v models.Vehicle) float64 {
+func CalcMaxSegmentSpeed(s models.Segmnent, v models.Vehicle) float64 {
 	if s.Direction == models.Straight {
 		return calcMaxStraightSpeed(s, v)
 	}

@@ -41,7 +41,7 @@ const (
 )
 
 type Segmnent struct {
-	Length            uint32
+	Length            float64
 	Direction         Direction
 	Corner            CornerLevel
 	Terrain           Terrain
@@ -50,5 +50,5 @@ type Segmnent struct {
 
 func (s *Segmnent) IsLengthValid() bool {
 	teoricalPerimeter := 2 * math.Pi * 100 / float64(s.Corner)
-	return (float64(s.Length) <= teoricalPerimeter/2)
+	return (s.Length <= teoricalPerimeter/2)
 }
