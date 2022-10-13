@@ -1,9 +1,11 @@
 package models
 
 type Vehicle struct {
-	Name         string
-	Manufacturer string
-	VehicleStats VehicleStats
+	Name         string       `json:"name"`
+	Manufacturer string       `json:"manufacturer"`
+	Class        Class        `json:"cls"`
+	DriveTrain   DriveTrain   `json:"driveTrain"`
+	VehicleStats VehicleStats `json:"vehicleStats"`
 }
 
 type DriveTrain uint8
@@ -14,8 +16,10 @@ const (
 	AWD
 )
 
-type VehicleStats struct {
-	Weight, Power, Torque, BreakTorque, Gears uint32
-	Class                                     Class
-	DriveTrain                                DriveTrain
-}
+// Represents vehicle stats
+// [0]Weight
+// [1]Power
+// [2]Torque
+// [3]BreakTorque
+// [4]Gears
+type VehicleStats [5]uint32
