@@ -40,16 +40,16 @@ func calcAirDragForce(v models.Vehicle, vs VehicleState) float64 {
 }
 
 func calcMaxDeceleration(v models.Vehicle, distance uint32) float64 {
-	torque := float64(v.VehicleStats.BreakTorque) // Nm
-	vehicleMass := float64(v.VehicleStats.Weight) // kg
-	d := float64(distance)                        // m
+	torque := float64(v.VehicleStats[3])      // Nm
+	vehicleMass := float64(v.VehicleStats[0]) // kg
+	d := float64(distance)                    // m
 	return -(torque / (vehicleMass * d))
 }
 
 func calcMaxAccleration(v models.Vehicle, distance uint32) float64 {
-	torque := float64(v.VehicleStats.Torque)      // Nm
-	vehicleMass := float64(v.VehicleStats.Weight) // kg
-	d := float64(distance)                        // m
+	torque := float64(v.VehicleStats[2])      // Nm
+	vehicleMass := float64(v.VehicleStats[0]) // kg
+	d := float64(distance)                    // m
 	return torque / (vehicleMass * d)
 }
 

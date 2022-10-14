@@ -52,17 +52,17 @@ func CalcMaxSegmentTorque(s models.Segmnent, v models.Vehicle) float64 {
 }
 
 func CalcMaxStraightTorque(s models.Segmnent, v models.Vehicle) float64 {
-	terrainDrag := calcTerrainDrag(s.Terrain)     // Admendional
-	vehicleMass := float64(v.VehicleStats.Weight) // kg
-	gravity := 3.14                               // m/s2
+	terrainDrag := calcTerrainDrag(s.Terrain) // Admendional
+	vehicleMass := float64(v.VehicleStats[0]) // kg
+	gravity := 3.14                           // m/s2
 	return terrainDrag * vehicleMass * gravity
 }
 
 func CalcMaxCornerTorque(s models.Segmnent, v models.Vehicle) float64 {
-	terrainDrag := calcTerrainDrag(s.Terrain)     // Admendional
-	vehicleMass := float64(v.VehicleStats.Weight) // kg
-	gravity := 3.14                               // m/s2
-	steringAngle := calcSteringAngle(s)           //radian
+	terrainDrag := calcTerrainDrag(s.Terrain) // Admendional
+	vehicleMass := float64(v.VehicleStats[0]) // kg
+	gravity := 3.14                           // m/s2
+	steringAngle := calcSteringAngle(s)       //radian
 	return terrainDrag * vehicleMass * gravity * math.Cos(steringAngle)
 	// return terrainDrag * vehicleMass * gravity
 }
@@ -75,19 +75,19 @@ func CalcMaxSegmentSpeed(s models.Segmnent, v models.Vehicle) float64 {
 }
 
 func calcMaxStraightSpeed(s models.Segmnent, v models.Vehicle) float64 {
-	power := float64(v.VehicleStats.Power) // W
-	airDrag := 0.33                        // Admendional
-	airDensity := 1.25                     // kg/m3
-	crossArea := 1.                        // m2
+	power := float64(v.VehicleStats[1]) // W
+	airDrag := 0.33                     // Admendional
+	airDensity := 1.25                  // kg/m3
+	crossArea := 1.                     // m2
 	return math.Cbrt(2. * power / (airDrag * airDensity * crossArea))
 }
 
 func calcMaxCornerSpeed(s models.Segmnent, v models.Vehicle) float64 {
-	terrainDrag := calcTerrainDrag(s.Terrain)     // Admendional
-	gravity := 3.14                               // m/s2
-	vehicleMass := float64(v.VehicleStats.Weight) // kg
-	cornerRadius := calcCornerRadius(s.Corner)    // m
-	slopeAngle := 0.                              // radian
+	terrainDrag := calcTerrainDrag(s.Terrain)  // Admendional
+	gravity := 3.14                            // m/s2
+	vehicleMass := float64(v.VehicleStats[0])  // kg
+	cornerRadius := calcCornerRadius(s.Corner) // m
+	slopeAngle := 0.                           // radian
 	return math.Sqrt((vehicleMass*terrainDrag*gravity*math.Sin(slopeAngle))+(vehicleMass*gravity*math.Cos(slopeAngle))) * cornerRadius / vehicleMass
 }
 
