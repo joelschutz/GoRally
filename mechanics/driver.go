@@ -7,13 +7,14 @@ import (
 )
 
 type DriverProjections struct {
+	segmentIndex                 uint32
 	targetSpeedsBySegment        []float64
 	targetBreakingZonesBySegment []float64
 }
 
 func CalcDriverAcceleration(t models.Track, r models.Driver, v models.Vehicle, s models.Segmnent, vs VehicleState) float64 {
 	paceNotes := fetchPaceNotes(t, r, vs)
-	projectedSpeed := vs.Speed
+	projections := calcDriverProjections(paceNotes, r, v)
 
 	return 0
 }
@@ -31,7 +32,7 @@ func calcDriverProjections(paceNotes []models.Segmnent, r models.Driver, v model
 			if breakingZone <= segment.Length {
 				break
 			}
-			maxSpeed -= maxSpeed * (0.2 / float64(r.Stats.DrivingStyle.Adaptability+1))
+			maxSpeed -= maxSpeed * (0.2 / float64(r.DrivingStyle[3]+1))
 			breakingZone = calcEstimateBreakingZone(maxSpeed, nextTargetSpeed, maxTorque)
 		}
 		nextTargetSpeed = maxSpeed
@@ -43,7 +44,7 @@ func calcDriverProjections(paceNotes []models.Segmnent, r models.Driver, v model
 
 func calcEstimateMaxSpeed(r models.Driver, v models.Vehicle, s models.Segmnent) float64 {
 	realMS := CalcMaxSegmentSpeed(s, v)
-	estimateError := ((.1 * (float64(r.Stats.DrivingStyle.Recklessness + 1))) / (float64(r.Stats.TerrainSkills[s.Terrain]) + 1.)) * rand.Float64()
+	estimateError := ((.1 * (float64(r.DrivingStyle[0] + 1))) / (float64(r.TerrainSkills[s.Terrain]) + 1.)) * rand.Float64()
 	if rand.Intn(2) == 0 {
 		estimateError *= -1
 	}
@@ -52,7 +53,7 @@ func calcEstimateMaxSpeed(r models.Driver, v models.Vehicle, s models.Segmnent) 
 
 func calcEstimateMaxTorque(r models.Driver, v models.Vehicle, s models.Segmnent) float64 {
 	realMS := CalcMaxSegmentTorque(s, v)
-	estimateError := ((.1 * (float64(r.Stats.DrivingStyle.Aggressiveness + 1))) / (float64(r.Stats.VehicleSkills[v.VehicleStats.DriveTrain]) + 1.)) * rand.Float64()
+	estimateError := ((.1 * (float64(r.DrivingStyle[2] + 1))) / (float64(r.VehicleSkills[v.DriveTrain]) + 1.)) * rand.Float64()
 	if rand.Intn(2) == 0 {
 		estimateError *= -1
 	}
@@ -60,7 +61,7 @@ func calcEstimateMaxTorque(r models.Driver, v models.Vehicle, s models.Segmnent)
 }
 
 func fetchPaceNotes(t models.Track, r models.Driver, vs VehicleState) (s []models.Segmnent) {
-	noteCount := (r.Stats.DrivingStyle.Communication + 4) / 2
+	noteCount := (r.DrivingStyle[1] + 4) / 2
 	for i, segment := range t.Segments {
 		if i > int(noteCount) {
 			break
@@ -70,7 +71,7 @@ func fetchPaceNotes(t models.Track, r models.Driver, vs VehicleState) (s []model
 	return s
 }
 
-func calcEstimateBreakingZone(initialSpeed, targetSpeed, maxTorque float64) (travelDistance float64) {
+func calcBreakingZone(initialSpeed, targetSpeed, maxTorque float64) (travelDistance float64) {
 	currentSpeed := initialSpeed
 	deltaTime := (initialSpeed - targetSpeed) / maxTorque
 
@@ -83,4 +84,13 @@ func calcEstimateBreakingZone(initialSpeed, targetSpeed, maxTorque float64) (tra
 	travelDistance += currentSpeed - speedDelta
 
 	return travelDistance
+}
+
+func calcEstimateBreakingZone(r models.Driver, v models.Vehicle, s1Speed, s2Speed, s1Torque float64) (travelDistance float64) {
+	realMS := calcBreakingZone(s1Speed, s2Speed, s1Torque)
+	estimateError := ((.05) / (float64(r.DrivingStyle[4] + 1))) * rand.Float64()
+	if rand.Intn(2) == 0 {
+		estimateError *= -1
+	}
+	return estimateError*realMS + realMS
 }
