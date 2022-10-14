@@ -7,24 +7,38 @@ import (
 	"github.com/joelschutz/gorally/models"
 )
 
+type TrackState struct {
+	s            models.Segmnent
+	paceNotes    []models.Segmnent
+	maxSpeed     float64
+	maxTorque    float64
+	distanceLeft float64
+}
+
 func CalcTrackTime(t models.Track, r models.Driver, v models.Vehicle) (tr models.TrackResult) {
 	vs := VehicleState{}
+	ts := TrackState{}
 	segmentsTime := []float64{}
 	for i, segment := range t.Segments {
-		distanceLeft := float64(segment.Length)
+		ts.distanceLeft = float64(segment.Length)
+		ts.maxSpeed = CalcMaxSegmentSpeed(segment, v)
+		ts.maxTorque = CalcMaxSegmentTorque(segment, v)
+		ts.paceNotes = fetchPaceNotes(t, r, uint64(i))
+		projections := CalcDriverProjections(r, v, vs, ts)
 		for {
 			segmentsTime[i]++
-			acc := CalcDriverAcceleration(t, r, v, segment, vs)
-			if vs.Speed <= CalcMaxSegmentSpeed(segment, v) && acc <= CalcMaxSegmentTorque(segment, v) { // Check if car is too fast to make the segment
+			acc := CalcDriverAcceleration(projections, vs, ts)
+			if vs.Speed <= ts.maxSpeed && acc <= ts.maxTorque { // Check if car is too fast to make the segment
 				speed := vs.Speed + acc
 				distanceTraveled := speed
 				vs.Speed = speed
-				if distanceTraveled >= distanceLeft {
-					pTime := distanceLeft / distanceTraveled
+				vs.Location = uint64(distanceTraveled)
+				if distanceTraveled >= ts.distanceLeft {
+					pTime := ts.distanceLeft / distanceTraveled
 					segmentsTime[i] -= 1 - pTime
 					break
 				}
-				distanceLeft -= distanceTraveled
+				ts.distanceLeft -= distanceTraveled
 			} else {
 				segmentsTime[i] += 5 // Adds 5s penalty
 				vs.Speed = 0         // Stop vehicle
@@ -42,6 +56,14 @@ func sumSegmentTimes(times []float64) (sum float64) {
 		sum += v
 	}
 	return sum
+}
+
+func fetchPaceNotes(t models.Track, r models.Driver, segmentIndex uint64) (s []models.Segmnent) {
+	noteCount := FetchPaceNotesCount(r)
+	for i := segmentIndex; i < noteCount+segmentIndex; i++ {
+		s = append(s, t.Segments[i])
+	}
+	return s
 }
 
 func CalcMaxSegmentTorque(s models.Segmnent, v models.Vehicle) float64 {

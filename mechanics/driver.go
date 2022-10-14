@@ -9,34 +9,47 @@ import (
 type DriverProjections struct {
 	segmentIndex                 uint32
 	targetSpeedsBySegment        []float64
+	targetTorqueBySegment        []float64
 	targetBreakingZonesBySegment []float64
 }
 
-func CalcDriverAcceleration(t models.Track, r models.Driver, v models.Vehicle, s models.Segmnent, vs VehicleState) float64 {
-	paceNotes := fetchPaceNotes(t, r, vs)
-	projections := calcDriverProjections(paceNotes, r, v)
+func CalcDriverAcceleration(p DriverProjections, vs VehicleState, ts TrackState) (acc float64) {
+	if ts.distanceLeft <= p.targetBreakingZonesBySegment[0] {
+		acc = p.targetSpeedsBySegment[1] - vs.Speed
+		if acc < (-1 * p.targetTorqueBySegment[0]) {
+			acc = -1 * p.targetTorqueBySegment[0]
+		}
+	} else {
+		acc = p.targetSpeedsBySegment[0] - vs.Speed
+		if acc > p.targetTorqueBySegment[0] {
+			acc = p.targetTorqueBySegment[0]
+		}
 
-	return 0
+	}
+	return acc
 }
 
-func calcDriverProjections(paceNotes []models.Segmnent, r models.Driver, v models.Vehicle) (p DriverProjections) {
+func CalcDriverProjections(r models.Driver, v models.Vehicle, vs VehicleState, ts TrackState) (p DriverProjections) {
+	paceNotes := ts.paceNotes
+	p.segmentIndex = uint32(vs.Location)
 	nextTargetSpeed := calcEstimateMaxSpeed(r, v, paceNotes[len(paceNotes)-1])
 	p.targetSpeedsBySegment[len(paceNotes)-1] = nextTargetSpeed
 	for i := len(paceNotes) - 2; i >= 0; i-- {
 		segment := paceNotes[i]
 		maxSpeed := calcEstimateMaxSpeed(r, v, segment)
 		maxTorque := calcEstimateMaxTorque(r, v, segment)
-		breakingZone := calcEstimateBreakingZone(maxSpeed, nextTargetSpeed, maxTorque)
+		breakingZone := calcEstimateBreakingZone(r, v, maxSpeed, nextTargetSpeed, maxTorque)
 
 		for {
 			if breakingZone <= segment.Length {
 				break
 			}
 			maxSpeed -= maxSpeed * (0.2 / float64(r.DrivingStyle[3]+1))
-			breakingZone = calcEstimateBreakingZone(maxSpeed, nextTargetSpeed, maxTorque)
+			breakingZone = calcEstimateBreakingZone(r, v, maxSpeed, nextTargetSpeed, maxTorque)
 		}
 		nextTargetSpeed = maxSpeed
 		p.targetSpeedsBySegment[i] = maxSpeed
+		p.targetTorqueBySegment[i] = maxTorque
 		p.targetBreakingZonesBySegment[i] = breakingZone
 	}
 	return p
@@ -60,15 +73,8 @@ func calcEstimateMaxTorque(r models.Driver, v models.Vehicle, s models.Segmnent)
 	return estimateError*realMS + realMS
 }
 
-func fetchPaceNotes(t models.Track, r models.Driver, vs VehicleState) (s []models.Segmnent) {
-	noteCount := (r.DrivingStyle[1] + 4) / 2
-	for i, segment := range t.Segments {
-		if i > int(noteCount) {
-			break
-		}
-		s = append(s, segment)
-	}
-	return s
+func FetchPaceNotesCount(r models.Driver) uint64 {
+	return (uint64(r.DrivingStyle[1]) + 4) / 2
 }
 
 func calcBreakingZone(initialSpeed, targetSpeed, maxTorque float64) (travelDistance float64) {
