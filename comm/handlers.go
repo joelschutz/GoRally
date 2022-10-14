@@ -33,7 +33,22 @@ func handleVehicle(payload Payload, db *DB) (msg []byte, err error) {
 		fmt.Println("vehicle: ", v)
 		db.Vehicles = append(db.Vehicles, v)
 	case "list":
-		return json.Marshal(db.Vehicles)
+		d, err := json.Marshal(db.Vehicles)
+		if err != nil {
+			return []byte("error"), fmt.Errorf("Failed to Unmarshall Vehicles: %s", err)
+		}
+		v := Payload{
+			Action: Action{
+				Target: "vehicle",
+				Method: "list",
+			},
+			Data: d,
+		}
+		p, err := json.Marshal(v)
+		if err != nil {
+			return []byte("error"), fmt.Errorf("Failed to Unmarshall Vehicles: %s", err)
+		}
+		return p, nil
 	}
 	return []byte("ok"), nil
 }
