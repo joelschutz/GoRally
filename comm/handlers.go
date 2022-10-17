@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/joelschutz/gorally/comm/schema"
 	"github.com/joelschutz/gorally/comm/services"
-	"github.com/joelschutz/gorally/models"
 )
 
 type WebSocketHandler interface {
@@ -18,12 +18,21 @@ type WebSocketHandler interface {
 }
 
 type Game struct {
-	upgrader *websocket.Upgrader
-	db       services.Storage
+	upgrader   *websocket.Upgrader
+	db         services.Storage
+	vehicleSvc services.ServiceHandler
+	driverSvc  services.ServiceHandler
+	trackSvc   services.ServiceHandler
 }
 
-func NewGameHandler(up *websocket.Upgrader, db services.Storage) *Game {
-	return &Game{upgrader: up, db: db}
+func NewGameHandler(up *websocket.Upgrader, db services.Storage, vehicleSvc services.ServiceHandler, driverSvc services.ServiceHandler, trackSvc services.ServiceHandler) *Game {
+	return &Game{
+		upgrader:   up,
+		db:         db,
+		vehicleSvc: vehicleSvc,
+		driverSvc:  driverSvc,
+		trackSvc:   trackSvc,
+	}
 }
 
 func (g *Game) HandleFunc(w http.ResponseWriter, r *http.Request) {
@@ -58,139 +67,19 @@ func (g *Game) HandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Game) HandleMessage(ctx context.Context, message []byte) (msg []byte, err error) {
-	data := Payload{}
+	data := schema.Payload{}
 	err = json.Unmarshal(message, &data)
 	if err != nil {
 		return []byte("error"), fmt.Errorf("Failed to Unmarshall message: %s", err)
 	}
 	switch data.Action.Target {
 	case "vehicle":
-		return g.handleVehicle(ctx, data)
+		return g.vehicleSvc.HandlePayload(ctx, data, g.db)
 	case "driver":
-		return g.handleDriver(ctx, data)
+		return g.driverSvc.HandlePayload(ctx, data, g.db)
 	case "track":
-		return g.handleTrack(ctx, data)
+		return g.trackSvc.HandlePayload(ctx, data, g.db)
 	}
 
 	return []byte("error"), fmt.Errorf("Target not Allowed")
-}
-
-func (g *Game) handleVehicle(ctx context.Context, payload Payload) (msg []byte, err error) {
-	switch payload.Action.Method {
-	case "add":
-		v := models.Vehicle{}
-		err := json.Unmarshal(payload.Data, &v)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall vehicle: %s", err)
-		}
-		fmt.Println("vehicle: ", v)
-		g.db.AddVehicle(ctx, v)
-	case "update":
-		v := models.Vehicle{}
-		err := json.Unmarshal(payload.Data, &v)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall vehicle: %s", err)
-		}
-		fmt.Println("vehicle: ", v)
-		g.db.UpdateVehicle(ctx, payload.Action.Index, v)
-	case "list":
-		arr, _ := g.db.ListVehicles(ctx)
-		d, err := json.Marshal(arr)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall Vehicles: %s", err)
-		}
-		v := Payload{
-			Action: Action{
-				Target: "vehicle",
-				Method: "list",
-			},
-			Data: d,
-		}
-		p, err := json.Marshal(v)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall Vehicles: %s", err)
-		}
-		return p, nil
-	}
-	return []byte("error"), fmt.Errorf("Method not Allowed")
-}
-
-func (g *Game) handleDriver(ctx context.Context, payload Payload) (msg []byte, err error) {
-	switch payload.Action.Method {
-	case "add":
-		v := models.Driver{}
-		err := json.Unmarshal(payload.Data, &v)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall driver: %s", err)
-		}
-		fmt.Println("driver: ", v)
-		g.db.AddDriver(ctx, v)
-	case "update":
-		v := models.Driver{}
-		err := json.Unmarshal(payload.Data, &v)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall driver: %s", err)
-		}
-		fmt.Println("driver: ", v)
-		g.db.UpdateDriver(ctx, payload.Action.Index, v)
-	case "list":
-		arr, _ := g.db.ListDrivers(ctx)
-		d, err := json.Marshal(arr)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall drivers: %s", err)
-		}
-		v := Payload{
-			Action: Action{
-				Target: "driver",
-				Method: "list",
-			},
-			Data: d,
-		}
-		p, err := json.Marshal(v)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall drivers: %s", err)
-		}
-		return p, nil
-	}
-	return []byte("error"), fmt.Errorf("Method not Allowed")
-}
-
-func (g *Game) handleTrack(ctx context.Context, payload Payload) (msg []byte, err error) {
-	switch payload.Action.Method {
-	case "add":
-		v := models.Track{}
-		err := json.Unmarshal(payload.Data, &v)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall track: %s", err)
-		}
-		fmt.Println("track: ", v)
-		g.db.AddTrack(ctx, v)
-	case "update":
-		v := models.Track{}
-		err := json.Unmarshal(payload.Data, &v)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall track: %s", err)
-		}
-		fmt.Println("track: ", v)
-		g.db.UpdateTrack(ctx, payload.Action.Index, v)
-	case "list":
-		arr, _ := g.db.ListTracks(ctx)
-		d, err := json.Marshal(arr)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall tracks: %s", err)
-		}
-		v := Payload{
-			Action: Action{
-				Target: "track",
-				Method: "list",
-			},
-			Data: d,
-		}
-		p, err := json.Marshal(v)
-		if err != nil {
-			return []byte("error"), fmt.Errorf("Failed to Unmarshall tracks: %s", err)
-		}
-		return p, nil
-	}
-	return []byte("error"), fmt.Errorf("Method not Allowed")
 }

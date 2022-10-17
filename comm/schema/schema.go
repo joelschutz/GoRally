@@ -1,4 +1,4 @@
-package comm
+package schema
 
 import "encoding/json"
 

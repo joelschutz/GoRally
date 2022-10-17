@@ -16,9 +16,13 @@ func main() {
 	db := services.NewMemoryDB()
 	// Create Upgrader
 	up := comm.NewUpgrader()
+	// Create Services
+	vSvc := services.NewVehicleService()
+	dSvc := services.NewDriverService()
+	tSvc := services.NewTrackService()
 	// Create Handlers
 	e := comm.NewEchoHandler(up)
-	g := comm.NewGameHandler(up, db)
+	g := comm.NewGameHandler(up, db, vSvc, dSvc, tSvc)
 
 	flag.Parse()
 	log.SetFlags(0)
