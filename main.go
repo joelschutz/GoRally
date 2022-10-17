@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -34,5 +35,6 @@ func main() {
 	log.SetFlags(0)
 	http.HandleFunc("/echo", e.HandleFunc)
 	http.HandleFunc("/game", g.HandleFunc)
+	fmt.Println("Starting Server")
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }

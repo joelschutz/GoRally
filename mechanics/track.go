@@ -12,6 +12,7 @@ func CalcTrackTime(t models.Track, r models.Driver, v models.Vehicle) (tr models
 	ts := models.TrackState{}
 
 	for i, segment := range t.Segments {
+		ts.Location = uint32(i)
 		ts.DistanceLeft = float64(segment.Length)
 		ts.MaxSpeed = CalcMaxSegmentSpeed(segment, v)
 		ts.MaxTorque = CalcMaxSegmentTorque(segment, v)
