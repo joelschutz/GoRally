@@ -1,4 +1,4 @@
-package services
+package storage
 
 import (
 	"context"
@@ -25,8 +25,6 @@ type Storage interface {
 	UpdateTrack(ctx context.Context, index uint, obj models.Track) error
 	UpdateEvent(ctx context.Context, index uint, obj models.Event) error
 }
-
-var db MemoryDB
 
 type MemoryDB struct {
 	Vehicles []models.Vehicle

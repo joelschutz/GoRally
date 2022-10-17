@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/joelschutz/gorally/comm/schema"
 	"github.com/joelschutz/gorally/comm/services"
+	"github.com/joelschutz/gorally/comm/storage"
 )
 
 type WebSocketHandler interface {
@@ -19,14 +20,14 @@ type WebSocketHandler interface {
 
 type Game struct {
 	upgrader   *websocket.Upgrader
-	db         services.Storage
+	db         storage.Storage
 	vehicleSvc services.ServiceHandler
 	driverSvc  services.ServiceHandler
 	trackSvc   services.ServiceHandler
 	eventSvc   services.ServiceHandler
 }
 
-func NewGameHandler(up *websocket.Upgrader, db services.Storage, vehicleSvc services.ServiceHandler, driverSvc services.ServiceHandler, trackSvc services.ServiceHandler, eventSvc services.ServiceHandler) *Game {
+func NewGameHandler(up *websocket.Upgrader, db storage.Storage, vehicleSvc services.ServiceHandler, driverSvc services.ServiceHandler, trackSvc services.ServiceHandler, eventSvc services.ServiceHandler) *Game {
 	return &Game{
 		upgrader:   up,
 		db:         db,

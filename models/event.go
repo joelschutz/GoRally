@@ -1,6 +1,11 @@
 package models
 
+import (
+	"gorm.io/gorm"
+)
+
 type Event struct {
+	gorm.Model
 	Name        string
 	Class       Class
 	Tracks      []Track
@@ -20,11 +25,13 @@ const (
 )
 
 type Competitor struct {
+	gorm.Model
 	Vehicle Vehicle
 	Driver  Driver
 }
 
 type TrackResult struct {
+	gorm.Model
 	TotalTime      float64
 	TimeBySegment  []float64
 	VStateBySecond []VehicleState

@@ -1,5 +1,7 @@
 package models
 
+import "gorm.io/gorm"
+
 type TrackState struct {
 	Segmnent     Segmnent
 	PaceNotes    []Segmnent
@@ -9,6 +11,7 @@ type TrackState struct {
 }
 
 type Track struct {
+	gorm.Model
 	Name     string     `json:"name"`
 	Country  string     `json:"country"`
 	Segments []Segmnent `json:"segments"`

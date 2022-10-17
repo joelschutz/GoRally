@@ -6,11 +6,12 @@ import (
 	"fmt"
 
 	"github.com/joelschutz/gorally/comm/schema"
+	"github.com/joelschutz/gorally/comm/storage"
 	"github.com/joelschutz/gorally/models"
 )
 
 type ServiceHandler interface {
-	HandlePayload(ctx context.Context, payload schema.Payload, db Storage) ([]byte, error)
+	HandlePayload(ctx context.Context, payload schema.Payload, db storage.Storage) ([]byte, error)
 }
 
 type VehicleService struct {
@@ -20,7 +21,7 @@ func NewVehicleService() *VehicleService {
 	return &VehicleService{}
 }
 
-func (g *VehicleService) HandlePayload(ctx context.Context, payload schema.Payload, db Storage) (msg []byte, err error) {
+func (g *VehicleService) HandlePayload(ctx context.Context, payload schema.Payload, db storage.Storage) (msg []byte, err error) {
 	switch payload.Action.Method {
 	case "add":
 		v := models.Vehicle{}
