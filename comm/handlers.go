@@ -23,15 +23,17 @@ type Game struct {
 	vehicleSvc services.ServiceHandler
 	driverSvc  services.ServiceHandler
 	trackSvc   services.ServiceHandler
+	eventSvc   services.ServiceHandler
 }
 
-func NewGameHandler(up *websocket.Upgrader, db services.Storage, vehicleSvc services.ServiceHandler, driverSvc services.ServiceHandler, trackSvc services.ServiceHandler) *Game {
+func NewGameHandler(up *websocket.Upgrader, db services.Storage, vehicleSvc services.ServiceHandler, driverSvc services.ServiceHandler, trackSvc services.ServiceHandler, eventSvc services.ServiceHandler) *Game {
 	return &Game{
 		upgrader:   up,
 		db:         db,
 		vehicleSvc: vehicleSvc,
 		driverSvc:  driverSvc,
 		trackSvc:   trackSvc,
+		eventSvc:   eventSvc,
 	}
 }
 
@@ -79,6 +81,8 @@ func (g *Game) HandleMessage(ctx context.Context, message []byte) (msg []byte, e
 		return g.driverSvc.HandlePayload(ctx, data, g.db)
 	case "track":
 		return g.trackSvc.HandlePayload(ctx, data, g.db)
+	case "event":
+		return g.eventSvc.HandlePayload(ctx, data, g.db)
 	}
 
 	return []byte("error"), fmt.Errorf("Target not Allowed")

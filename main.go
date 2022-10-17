@@ -20,9 +20,10 @@ func main() {
 	vSvc := services.NewVehicleService()
 	dSvc := services.NewDriverService()
 	tSvc := services.NewTrackService()
+	eSvc := services.NewEventService()
 	// Create Handlers
 	e := comm.NewEchoHandler(up)
-	g := comm.NewGameHandler(up, db, vSvc, dSvc, tSvc)
+	g := comm.NewGameHandler(up, db, vSvc, dSvc, tSvc, eSvc)
 
 	flag.Parse()
 	log.SetFlags(0)
