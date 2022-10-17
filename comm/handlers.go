@@ -22,8 +22,8 @@ type Game struct {
 	db       services.Storage
 }
 
-func NewGameHandler(up *websocket.Upgrader) *Game {
-	return &Game{upgrader: up}
+func NewGameHandler(up *websocket.Upgrader, db services.Storage) *Game {
+	return &Game{upgrader: up, db: db}
 }
 
 func (g *Game) HandleFunc(w http.ResponseWriter, r *http.Request) {

@@ -30,6 +30,14 @@ type MemoryDB struct {
 	Tracks   []models.Track
 }
 
+func NewMemoryDB() *MemoryDB {
+	return &MemoryDB{
+		Vehicles: []models.Vehicle{},
+		Drivers:  []models.Driver{},
+		Tracks:   []models.Track{},
+	}
+}
+
 func (s *MemoryDB) GetVehicle(ctx context.Context, index uint) (models.Vehicle, error) {
 	if len(s.Vehicles) > int(index) {
 		return s.Vehicles[index], nil
