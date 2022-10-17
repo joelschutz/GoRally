@@ -10,24 +10,25 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/joelschutz/gorally/models"
 )
 
-type DB struct {
-	Vehicles []models.Vehicle
-	Drivers  []models.Driver
+func NewUpgrader() *websocket.Upgrader {
+	return &websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool { return true },
+	}
 }
 
-var db DB
+type Echo struct {
+	upgrader *websocket.Upgrader
+}
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin:  func(r *http.Request) bool { return true },
-	Subprotocols: []string{"lws-mirror-protocol"},
-} // use default options
+func NewEchoHandler(up *websocket.Upgrader) *Echo {
+	return &Echo{upgrader: up}
+}
 
-func Echo(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
-	fmt.Println("subprotocol set: ", c.Subprotocol())
+func (e *Echo) HandleFunc(w http.ResponseWriter, r *http.Request) {
+	c, err := e.upgrader.Upgrade(w, r, nil)
+	fmt.Println("Connected")
 	if err != nil {
 		log.Print("upgrade:", err)
 		return
@@ -47,36 +48,5 @@ func Echo(w http.ResponseWriter, r *http.Request) {
 			log.Println("write:", err)
 			break
 		}
-	}
-}
-
-func Game(w http.ResponseWriter, r *http.Request) {
-	c, err := upgrader.Upgrade(w, r, nil)
-	fmt.Println("subprotocol set: ", c.Subprotocol())
-	if err != nil {
-		log.Print("upgrade:", err)
-		return
-	}
-	defer c.Close()
-	for {
-		mt, message, err := c.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
-			}
-			break
-		}
-		log.Printf("recv: %s", message)
-		message, err = HandleMessage(message, &db)
-		if err != nil {
-			fmt.Println(err)
-		}
-		err = c.WriteMessage(mt, message)
-		fmt.Printf("just sent: %s", message)
-		if err != nil {
-			log.Println("write:", err)
-			break
-		}
-		fmt.Println("db: ", db)
 	}
 }
