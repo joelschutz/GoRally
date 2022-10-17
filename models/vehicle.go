@@ -1,5 +1,10 @@
 package models
 
+type VehicleState struct {
+	Speed, Acceleration, Damage, Fuel float64
+	Location                          uint64 // Segment index
+}
+
 type Vehicle struct {
 	Name         string       `json:"name"`
 	Manufacturer string       `json:"manufacturer"`

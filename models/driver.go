@@ -16,14 +16,14 @@ type Driver struct {
 // [3]LightGravel
 // [4]Sand
 // [5]Snow
-type TerrainSkills [6]int32
+type TerrainSkills [6]uint32
 
 // Represents the driver skill for each drivetrain
 //
 // [0]FWD
 // [1]RWD
 // [2]AWD
-type VehicleSkills [3]int32
+type VehicleSkills [3]uint32
 
 //	Represents the driver style for each caracteristic
 //
@@ -32,4 +32,4 @@ type VehicleSkills [3]int32
 // [2]Aggressiveness - Limits the max torque estimate accurace
 // [3]Adaptability - Extend the breaking zone estimate accurace
 // [4]Reflexes - Limits the breaking zone estimate accurace
-type DrivingStyle [5]int32
+type DrivingStyle [5]uint32

@@ -1,10 +1,17 @@
 package models
 
-import "math"
+type TrackState struct {
+	Segmnent     Segmnent
+	PaceNotes    []Segmnent
+	MaxSpeed     float64
+	MaxTorque    float64
+	DistanceLeft float64
+}
 
 type Track struct {
-	Name     string
-	Segments []Segmnent
+	Name     string     `json:"name"`
+	Country  string     `json:"country"`
+	Segments []Segmnent `json:"segments"`
 }
 
 type Terrain uint8
@@ -41,14 +48,9 @@ const (
 )
 
 type Segmnent struct {
-	Length            float64
-	Direction         Direction
-	Corner            CornerLevel
-	Terrain           Terrain
+	Length            float64     `json:"length"`
+	Direction         Direction   `json:"direction"`
+	Corner            CornerLevel `json:"corner"`
+	Terrain           Terrain     `json:"terrain"`
 	Cut, Unseen, Jump bool
-}
-
-func (s *Segmnent) IsLengthValid() bool {
-	teoricalPerimeter := 2 * math.Pi * 100 / float64(s.Corner)
-	return (s.Length <= teoricalPerimeter/2)
 }

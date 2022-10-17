@@ -25,8 +25,10 @@ type Competitor struct {
 }
 
 type TrackResult struct {
-	TotalTime     float64
-	TimeBySegment []float64
+	TotalTime      float64
+	TimeBySegment  []float64
+	VStateBySecond []VehicleState
+	TStateBySecond []TrackState
 }
 
 type EventResults map[Competitor][]TrackResult
