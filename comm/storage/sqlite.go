@@ -18,6 +18,13 @@ func NewSqliteDB(fileName string) (*SqliteDB, error) {
 		return nil, err
 	}
 
+	// Migrate the schema
+	db.AutoMigrate(&Driver{})
+	db.AutoMigrate(&Track{})
+	db.AutoMigrate(&Event{})
+	db.AutoMigrate(&Vehicle{})
+	db.AutoMigrate(&Competitor{})
+
 	return &SqliteDB{db: db}, nil
 }
 

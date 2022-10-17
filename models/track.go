@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 type TrackState struct {
-	Segmnent     Segmnent
+	Location     uint32
 	PaceNotes    []Segmnent
 	MaxSpeed     float64
 	MaxTorque    float64
@@ -11,7 +9,6 @@ type TrackState struct {
 }
 
 type Track struct {
-	gorm.Model
 	Name     string     `json:"name"`
 	Country  string     `json:"country"`
 	Segments []Segmnent `json:"segments"`

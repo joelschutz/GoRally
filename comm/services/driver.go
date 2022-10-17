@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/joelschutz/gorally/comm/schema"
+	"github.com/joelschutz/gorally/comm/storage"
 	"github.com/joelschutz/gorally/models"
 )
 
@@ -16,7 +17,7 @@ func NewDriverService() *DriverService {
 	return &DriverService{}
 }
 
-func (g *DriverService) HandlePayload(ctx context.Context, payload schema.Payload, db Storage) (msg []byte, err error) {
+func (g *DriverService) HandlePayload(ctx context.Context, payload schema.Payload, db storage.Storage) (msg []byte, err error) {
 	switch payload.Action.Method {
 	case "add":
 		v := models.Driver{}

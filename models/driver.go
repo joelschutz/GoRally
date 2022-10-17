@@ -1,9 +1,6 @@
 package models
 
-import "gorm.io/gorm"
-
 type Driver struct {
-	gorm.Model
 	Name          string        `json:"name"`
 	Age           uint64        `json:"age"`
 	TerrainSkills TerrainSkills `json:"terrainSkills"`
