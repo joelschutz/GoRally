@@ -13,8 +13,8 @@ type DriverProjections struct {
 	targetBreakingZonesBySegment []float64
 }
 
-func CalcDriverAcceleration(p DriverProjections, vs VehicleState, ts TrackState) (acc float64) {
-	if ts.distanceLeft <= p.targetBreakingZonesBySegment[0] {
+func CalcDriverAcceleration(p DriverProjections, vs models.VehicleState, ts models.TrackState) (acc float64) {
+	if ts.DistanceLeft <= p.targetBreakingZonesBySegment[0] {
 		acc = p.targetSpeedsBySegment[1] - vs.Speed
 		if acc < (-1 * p.targetTorqueBySegment[0]) {
 			acc = -1 * p.targetTorqueBySegment[0]
@@ -29,8 +29,8 @@ func CalcDriverAcceleration(p DriverProjections, vs VehicleState, ts TrackState)
 	return acc
 }
 
-func CalcDriverProjections(r models.Driver, v models.Vehicle, vs VehicleState, ts TrackState) (p DriverProjections) {
-	paceNotes := ts.paceNotes
+func CalcDriverProjections(r models.Driver, v models.Vehicle, vs models.VehicleState, ts models.TrackState) (p DriverProjections) {
+	paceNotes := ts.PaceNotes
 	p.segmentIndex = uint32(vs.Location)
 	nextTargetSpeed := calcEstimateMaxSpeed(r, v, paceNotes[len(paceNotes)-1])
 	p.targetSpeedsBySegment[len(paceNotes)-1] = nextTargetSpeed

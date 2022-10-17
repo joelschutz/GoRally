@@ -7,47 +7,40 @@ import (
 	"github.com/joelschutz/gorally/models"
 )
 
-type TrackState struct {
-	s            models.Segmnent
-	paceNotes    []models.Segmnent
-	maxSpeed     float64
-	maxTorque    float64
-	distanceLeft float64
-}
-
 func CalcTrackTime(t models.Track, r models.Driver, v models.Vehicle) (tr models.TrackResult) {
-	vs := VehicleState{}
-	ts := TrackState{}
-	segmentsTime := []float64{}
+	vs := models.VehicleState{}
+	ts := models.TrackState{}
+
 	for i, segment := range t.Segments {
-		ts.distanceLeft = float64(segment.Length)
-		ts.maxSpeed = CalcMaxSegmentSpeed(segment, v)
-		ts.maxTorque = CalcMaxSegmentTorque(segment, v)
-		ts.paceNotes = fetchPaceNotes(t, r, uint64(i))
+		ts.DistanceLeft = float64(segment.Length)
+		ts.MaxSpeed = CalcMaxSegmentSpeed(segment, v)
+		ts.MaxTorque = CalcMaxSegmentTorque(segment, v)
+		ts.PaceNotes = fetchPaceNotes(t, r, uint64(i))
 		projections := CalcDriverProjections(r, v, vs, ts)
 		for {
-			segmentsTime[i]++
+			tr.TimeBySegment[i]++
+			tr.VStateBySecond = append(tr.VStateBySecond, vs)
+			tr.TStateBySecond = append(tr.TStateBySecond, ts)
 			acc := CalcDriverAcceleration(projections, vs, ts)
-			if vs.Speed <= ts.maxSpeed && acc <= ts.maxTorque { // Check if car is too fast to make the segment
+			if vs.Speed <= ts.MaxSpeed && acc <= ts.MaxTorque { // Check if car is too fast to make the segment
 				speed := vs.Speed + acc
 				distanceTraveled := speed
 				vs.Speed = speed
 				vs.Location = uint64(distanceTraveled)
-				if distanceTraveled >= ts.distanceLeft {
-					pTime := ts.distanceLeft / distanceTraveled
-					segmentsTime[i] -= 1 - pTime
+				if distanceTraveled >= ts.DistanceLeft {
+					pTime := ts.DistanceLeft / distanceTraveled
+					tr.TimeBySegment[i] -= 1 - pTime
 					break
 				}
-				ts.distanceLeft -= distanceTraveled
+				ts.DistanceLeft -= distanceTraveled
 			} else {
-				segmentsTime[i] += 5 // Adds 5s penalty
-				vs.Speed = 0         // Stop vehicle
-				vs.Damage += 1       // Apply Damage
+				tr.TimeBySegment[i] += 5 // Adds 5s penalty
+				vs.Speed = 0             // Stop vehicle
+				vs.Damage += 1           // Apply Damage
 			}
 		}
 	}
-	tr.TotalTime = sumSegmentTimes(segmentsTime)
-	tr.TimeBySegment = segmentsTime
+	tr.TotalTime = sumSegmentTimes(tr.TimeBySegment)
 	return tr
 }
 

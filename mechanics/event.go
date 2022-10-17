@@ -2,13 +2,17 @@ package mechanics
 
 import "github.com/joelschutz/gorally/models"
 
-func calcEventResults(e models.Event) (er models.EventResults) {
+func CalcEventResults(e models.Event) (er models.EventResults) {
 	for _, comp := range e.Competitors {
 		for i, t := range e.Tracks {
-			er[comp][i] = CalcTrackTime(t, comp.Driver, comp.Vehicle)
+			er[comp][i] = calcCompetitorResult(comp, t)
 		}
 	}
 	return er
+}
+
+func calcCompetitorResult(c models.Competitor, t models.Track) models.TrackResult {
+	return CalcTrackTime(t, c.Driver, c.Vehicle)
 }
 
 func calcEventRanking(er models.EventResults) (r models.Ranking) {
