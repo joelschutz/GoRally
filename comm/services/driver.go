@@ -43,7 +43,7 @@ func (g *DriverService) HandlePayload(ctx context.Context, payload schema.Payloa
 		}
 		v := schema.Payload{
 			Action: schema.Action{
-				Target: "vehicle",
+				Target: "driver",
 				Method: "list",
 			},
 			Data: d,

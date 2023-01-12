@@ -12,3 +12,15 @@ type Action struct {
 	Method string `json:"method"`
 	Index  uint   `json:"index"`
 }
+
+type EventSchema struct {
+	Name        string `json:"name"`
+	Class       uint8  `json:"calss"`
+	Tracks      []uint `json:"tracks"`
+	Competitors []uint `json:"competitors"`
+}
+
+type CompetitorSchema struct {
+	Vehicle uint `json:"vehicle"`
+	Driver  uint `json:"driver"`
+}

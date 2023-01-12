@@ -68,23 +68,23 @@ func validateTrackSegments(d models.Track) (bool, string) {
 	return true, ""
 }
 
-func validateSegmentLength(d models.Segmnent) bool {
+func validateSegmentLength(d models.Segment) bool {
 	// No tighter than a hairpin
 	teoricalPerimeter := 2 * math.Pi * 100 / float64(d.Corner)
 	return (d.Length > teoricalPerimeter/2)
 }
 
-func validateSegmentDirection(d models.Segmnent) bool {
+func validateSegmentDirection(d models.Segment) bool {
 	// Only 3 options
 	return (d.Direction > 2)
 }
 
-func validateSegmentCorner(d models.Segmnent) bool {
+func validateSegmentCorner(d models.Segment) bool {
 	// Only 9 options
 	return (d.Corner > 8)
 }
 
-func validateSegmentTerrain(d models.Segmnent) bool {
+func validateSegmentTerrain(d models.Segment) bool {
 	// Only 6 options
 	return (d.Terrain > 5)
 }

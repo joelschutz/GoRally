@@ -85,7 +85,7 @@ func saveToCsv(data models.TrackResult) {
 func (g *EventService) HandlePayload(ctx context.Context, payload schema.Payload, db storage.Storage) (msg []byte, err error) {
 	switch payload.Action.Method {
 	case "add":
-		v := models.Event{}
+		v := schema.EventSchema{}
 		err := json.Unmarshal(payload.Data, &v)
 		if err != nil {
 			return []byte("error"), fmt.Errorf("Failed to Unmarshall Events: %s", err)
@@ -93,7 +93,7 @@ func (g *EventService) HandlePayload(ctx context.Context, payload schema.Payload
 		fmt.Println("vehicle: ", v)
 		return msg, db.AddEvent(ctx, v)
 	case "update":
-		v := models.Event{}
+		v := schema.EventSchema{}
 		err := json.Unmarshal(payload.Data, &v)
 		if err != nil {
 			return []byte("error"), fmt.Errorf("Failed to Unmarshall Events: %s", err)
@@ -108,7 +108,7 @@ func (g *EventService) HandlePayload(ctx context.Context, payload schema.Payload
 		}
 		v := schema.Payload{
 			Action: schema.Action{
-				Target: "vehicle",
+				Target: "event",
 				Method: "list",
 			},
 			Data: d,

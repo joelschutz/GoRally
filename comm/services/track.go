@@ -43,7 +43,7 @@ func (g *TrackService) HandlePayload(ctx context.Context, payload schema.Payload
 		}
 		v := schema.Payload{
 			Action: schema.Action{
-				Target: "vehicle",
+				Target: "track",
 				Method: "list",
 			},
 			Data: d,

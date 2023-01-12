@@ -30,6 +30,6 @@ type VehicleSkills [3]uint32
 // [0]Recklessness - Limits the max speed estimate accurace
 // [1]Communication - Extend the max number os pacenotes called
 // [2]Aggressiveness - Limits the max torque estimate accurace
-// [3]Adaptability - Extend the breaking zone estimate accurace
-// [4]Reflexes - Limits the breaking zone estimate accurace
+// [3]Adaptability - Limits the track estimate resolution
+// [4]Reflexes - Limits the grip estimate resolution
 type DrivingStyle [5]uint32

@@ -1,8 +1,8 @@
 package models
 
 type VehicleState struct {
-	Speed, Acceleration, Damage, Fuel float64
-	Location                          uint64 // Segment index
+	Speed, Tangent, Damage float64
+	Location               Point2D // Segment index
 }
 
 type Vehicle struct {
